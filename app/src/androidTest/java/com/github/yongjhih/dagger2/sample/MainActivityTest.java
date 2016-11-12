@@ -7,7 +7,6 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.novoda.rxpresso.RxPresso;
-import com.novoda.rxpresso.matcher.RxMatcher;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,17 +14,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.Component;
-import rx.Notification;
 import rx.Observable;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -40,12 +36,6 @@ import static org.mockito.Mockito.when;
 public class MainActivityTest {
     @Inject
     GitHub github;
-
-    @Singleton
-    @Component(modules = MockGitHubModule.class)
-    public interface TestComponent extends MainComponent {
-        void inject(MainActivityTest mainActivityTest);
-    }
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
@@ -72,7 +62,7 @@ public class MainActivityTest {
     public void testRepos() {
         Repo repo = new Repo();
         repo.owner.login = "yongjhh";
-        repo.owner.login = "https://avatars.githubusercontent.com/u/213736?v=3";
+        repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
         repo.name = "android-proguards";
         when(github.repos("yongjhih")).thenReturn(Observable.just(Arrays.asList(repo)));
 
@@ -83,13 +73,13 @@ public class MainActivityTest {
 
     @Test
     public void testRxRepos() {
-        RxPresso rxpresso = RxPresso.from(github);
-        Espresso.registerIdlingResources(rxpresso);
         Repo repo = new Repo();
         repo.owner.login = "yongjhh";
-        repo.owner.login = "https://avatars.githubusercontent.com/u/213736?v=3";
+        repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
         repo.name = "android-proguards";
 
+        RxPresso rxpresso = RxPresso.from(github);
+        Espresso.registerIdlingResources(rxpresso);
         rxpresso.given(github.repos("yongjhih").flatMap(Observable::from))
                 .withEventsFrom(Observable.just(repo))
                 .expect(any(Repo.class))

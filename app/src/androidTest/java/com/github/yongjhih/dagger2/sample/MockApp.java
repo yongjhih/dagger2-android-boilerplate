@@ -6,7 +6,12 @@ package com.github.yongjhih.dagger2.sample;
 public class MockApp extends App {
     @Override
     protected MainComponent createMainComponent() {
-        //return DaggerTestComponent.builder().build();
-        return DaggerMainActivityTest_TestComponent.builder().build();
+        AppModule appModule = new AppModule(this);
+        GitHubModule gitHubModule = new GitHubModule("https://api.github.com/");
+
+        return DaggerTestComponent.builder()
+                .appModule(appModule)
+                .gitHubModule(gitHubModule)
+                .build();
     }
 }

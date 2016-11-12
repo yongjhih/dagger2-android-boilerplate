@@ -2,6 +2,10 @@ package com.github.yongjhih.dagger2.sample;
 
 import android.support.multidex.MultiDexApplication;
 
+import javax.inject.Singleton;
+
+import dagger.Component;
+
 public class App extends MultiDexApplication {
     MainComponent mainComponent;
 
