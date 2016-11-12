@@ -8,11 +8,15 @@ public class App extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        mainComponent = createMainComponent();
+    }
 
+    // Allow override by flavor such as androidTest
+    protected MainComponent createMainComponent() {
         AppModule appModule = new AppModule(this);
         GitHubModule gitHubModule = new GitHubModule("https://api.github.com/");
 
-        mainComponent = DaggerMainComponent.builder()
+        return DaggerMainComponent.builder()
                 .appModule(appModule)
                 .gitHubModule(gitHubModule)
                 .build();

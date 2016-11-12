@@ -2,6 +2,7 @@ package com.github.yongjhih.dagger2.sample;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -29,6 +30,7 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
  * ui/MainActivity
  * </pre>
  */
+@VisibleForTesting
 public class MainActivity
         extends RxAppCompatActivity {
 
