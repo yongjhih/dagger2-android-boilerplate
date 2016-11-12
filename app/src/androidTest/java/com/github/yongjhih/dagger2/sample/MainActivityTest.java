@@ -3,6 +3,7 @@ package com.github.yongjhih.dagger2.sample;
 import android.app.Instrumentation;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
+import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.when;
  * Created by andrew on 11/8/16.
  */
 @RunWith(AndroidJUnit4.class)
+@LargeTest
 public class MainActivityTest {
     @Inject
     GitHub github;
