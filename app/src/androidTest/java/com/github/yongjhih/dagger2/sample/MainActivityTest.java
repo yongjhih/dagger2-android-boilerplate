@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,8 +33,9 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static com.novoda.rxpresso.matcher.RxExpect.any;
-import static org.mockito.ArgumentMatchers.contains;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
@@ -57,6 +59,20 @@ public class MainActivityTest {
         App app = (App) instrumentation.getTargetContext().getApplicationContext();
         TestComponent component = (TestComponent) app.mainComponent();
         component.inject(this);
+
+        Repo repo = new Repo();
+        repo.owner = new User();
+        repo.owner.login = "yongjhh";
+        repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
+        repo.name = "android-proguards";
+        when(github.repos(any())).thenReturn(Observable.just(Arrays.asList(repo)));
+    }
+
+    @Test
+    public void testDisplayed() {
+        // Launch the activity to make the fragment visible
+        onView(withId(R.id.repos_frag)).check(matches(isDisplayed()));
+        //onView(withId(R.id.list)).check(matches(isDisplayed())); // fragment did not attach?
     }
 
     @Test
@@ -68,13 +84,6 @@ public class MainActivityTest {
 
     @Test
     public void testRepos() {
-        Repo repo = new Repo();
-        repo.owner = new User();
-        repo.owner.login = "yongjhh";
-        repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
-        repo.name = "android-proguards";
-        when(github.repos("yongjhih")).thenReturn(Observable.just(Arrays.asList(repo)));
-
         //mocker(GitHub.class).when(github -> github.repos("yongjhih")).thenReturn(github -> Observable.just(Arrays.asList(repo)));
         mFragmentRule.launchActivity(null);
         onView(withText("android-proguards")).check(matches(isDisplayed()));
@@ -88,12 +97,13 @@ public class MainActivityTest {
     //    repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
     //    repo.name = "android-proguards";
 
+    //    mFragmentRule.launchActivity(null);
     //    //List<Repo> t = Collections.emptyList();
     //    RxPresso rxpresso = RxPresso.from(github);
     //    Espresso.registerIdlingResources(rxpresso);
-    //    rxpresso.given(github.repos("yongjhih"))
+    //    rxpresso.given(github.repos(any()))
     //            .withEventsFrom(Observable.just(Arrays.asList(repo)))
-    //            .expect(any(t.getClass()))
+    //            .expect(any())
     //            .thenOnView(withText("android-proguards"))
     //            .check(matches(isDisplayed()));
     //}

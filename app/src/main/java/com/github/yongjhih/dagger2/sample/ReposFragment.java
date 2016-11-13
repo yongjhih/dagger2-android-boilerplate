@@ -14,6 +14,8 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.infstory.v7.widget.ListRecyclerAdapter;
 import com.trello.rxlifecycle.components.support.RxFragment;
 
+import java.util.List;
+
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -33,7 +35,7 @@ public class ReposFragment extends RxFragment {
     private ListRecyclerAdapter<Repo, RepoListPresenter> mRepoAdapter;
 
     @Inject
-    GitHub gitHub;
+    GitHub github;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -66,8 +68,12 @@ public class ReposFragment extends RxFragment {
         mRepoAdapter.createPresenter((parent, viewType) -> {
             return new RepoListPresenter(LayoutInflater.from(getContext()).inflate(R.layout.list_repo, parent, false));
         });
-        gitHub.repos("yongjhih")
-                .compose(bindToLifecycle())
+        Observable<List<Repo>> repoObs = github.repos("yongjhih");
+        if (repoObs == null) {
+            Log.e(TAG, "GitHub.repos(String) == null");
+            repoObs = Observable.empty();
+        }
+        repoObs.compose(bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(repos -> {
