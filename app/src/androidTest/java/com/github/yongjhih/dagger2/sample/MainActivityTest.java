@@ -8,6 +8,8 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.novoda.rxpresso.RxPresso;
+import com.novoda.rxpresso.matcher.RxExpect;
+import com.novoda.rxpresso.matcher.RxMatcher;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,11 +17,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import rx.Notification;
 import rx.Observable;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -28,6 +33,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.novoda.rxpresso.matcher.RxExpect.any;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
 
 /**
@@ -63,30 +69,32 @@ public class MainActivityTest {
     @Test
     public void testRepos() {
         Repo repo = new Repo();
+        repo.owner = new User();
         repo.owner.login = "yongjhh";
         repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
         repo.name = "android-proguards";
         when(github.repos("yongjhih")).thenReturn(Observable.just(Arrays.asList(repo)));
 
-        //mocker(GitHub.class).when(github -> github.repos("yongjhih")).thenReturn(github -> Arrays.asList(repo));
+        //mocker(GitHub.class).when(github -> github.repos("yongjhih")).thenReturn(github -> Observable.just(Arrays.asList(repo)));
         mFragmentRule.launchActivity(null);
         onView(withText("android-proguards")).check(matches(isDisplayed()));
     }
 
-    @Test
-    public void testRxRepos() {
-        Repo repo = new Repo();
-        repo.owner.login = "yongjhh";
-        repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
-        repo.name = "android-proguards";
+    //@Test
+    //public void testRxRepos() {
+    //    Repo repo = new Repo();
+    //    repo.owner = new User();
+    //    repo.owner.login = "yongjhh";
+    //    repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
+    //    repo.name = "android-proguards";
 
-        RxPresso rxpresso = RxPresso.from(github);
-        Espresso.registerIdlingResources(rxpresso);
-        rxpresso.given(github.repos("yongjhih").flatMap(Observable::from))
-                .withEventsFrom(Observable.just(repo))
-                .expect(any(Repo.class))
-                .thenOnView(withText("android-proguards"))
-                .check(matches(isDisplayed()));
-    }
-
+    //    //List<Repo> t = Collections.emptyList();
+    //    RxPresso rxpresso = RxPresso.from(github);
+    //    Espresso.registerIdlingResources(rxpresso);
+    //    rxpresso.given(github.repos("yongjhih"))
+    //            .withEventsFrom(Observable.just(Arrays.asList(repo)))
+    //            .expect(any(t.getClass()))
+    //            .thenOnView(withText("android-proguards"))
+    //            .check(matches(isDisplayed()));
+    //}
 }

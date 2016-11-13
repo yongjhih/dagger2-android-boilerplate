@@ -9,7 +9,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {AppModule.class, GitHubModule.class})
+@Component(modules = {AppModule.class, MockGitHubModule.class})
 public interface TestComponent extends MainComponent {
     void inject(MainActivityTest mainActivityTest);
 }
