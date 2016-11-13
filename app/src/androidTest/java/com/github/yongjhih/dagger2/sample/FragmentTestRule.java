@@ -2,6 +2,7 @@ package com.github.yongjhih.dagger2.sample;
 
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.support.annotation.CallSuper;
 import android.support.test.rule.ActivityTestRule;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -26,6 +27,7 @@ public class FragmentTestRule<F extends Fragment> extends ActivityTestRule<TestA
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
+    @CallSuper
     @Override
     protected void afterActivityLaunched() {
         super.afterActivityLaunched();

@@ -11,6 +11,7 @@ import com.novoda.rxpresso.RxPresso;
 import com.novoda.rxpresso.matcher.RxExpect;
 import com.novoda.rxpresso.matcher.RxMatcher;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,14 +45,34 @@ import static org.mockito.Mockito.when;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class MainActivityTest {
-    @Inject
-    GitHub github;
-
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
 
     @Rule
-    public FragmentTestRule<ReposFragment> mFragmentRule = new FragmentTestRule<>(ReposFragment.class);
+    public FragmentTestRule<ReposFragment> mFragmentRule = new FragmentTestRule<ReposFragment>(ReposFragment.class) {
+        @Override
+        protected void beforeActivityLaunched() {
+            Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+            App app = (App) instrumentation.getTargetContext().getApplicationContext();
+            TestComponent component = (TestComponent) app.mainComponent();
+            component.inject(MainActivityTest.this);
+
+            //rxpresso = RxPresso.from(github);
+            //Espresso.registerIdlingResources(rxpresso);
+        }
+
+        @Override
+        protected void afterActivityFinished() {
+            super.afterActivityFinished();
+            //Espresso.unregisterIdlingResources(rxpresso);
+            //rxpresso.resetMocks();
+        }
+    };
+
+    @Inject
+    GitHub github;
+
+    RxPresso rxpresso;
 
     @Before
     public void setUp() {
@@ -60,12 +81,14 @@ public class MainActivityTest {
         TestComponent component = (TestComponent) app.mainComponent();
         component.inject(this);
 
-        Repo repo = new Repo();
-        repo.owner = new User();
-        repo.owner.login = "yongjhh";
-        repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
-        repo.name = "android-proguards";
-        when(github.repos(any())).thenReturn(Observable.just(Arrays.asList(repo)));
+        //rxpresso = RxPresso.from(github);
+        //Espresso.registerIdlingResources(rxpresso);
+    }
+
+    @After
+    public void setDown() {
+        //Espresso.unregisterIdlingResources(rxpresso);
+        //rxpresso.resetMocks();
     }
 
     @Test
@@ -84,27 +107,31 @@ public class MainActivityTest {
 
     @Test
     public void testRepos() {
+        Repo repo = new Repo();
+        repo.owner = new User();
+        repo.owner.login = "yongjhh";
+        repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
+        repo.name = "android-proguards";
+        when(github.repos(any())).thenReturn(Observable.just(Arrays.asList(repo)));
         //mocker(GitHub.class).when(github -> github.repos("yongjhih")).thenReturn(github -> Observable.just(Arrays.asList(repo)));
         mFragmentRule.launchActivity(null);
         onView(withText("android-proguards")).check(matches(isDisplayed()));
     }
 
     //@Test
-    //public void testRxRepos() {
-    //    Repo repo = new Repo();
-    //    repo.owner = new User();
-    //    repo.owner.login = "yongjhh";
-    //    repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
-    //    repo.name = "android-proguards";
+    public void testRxRepos() {
+        Repo repo = new Repo();
+        repo.owner = new User();
+        repo.owner.login = "yongjhh";
+        repo.owner.avatar_url = "https://avatars.githubusercontent.com/u/213736?v=3";
+        repo.name = "android-proguards";
 
-    //    mFragmentRule.launchActivity(null);
-    //    //List<Repo> t = Collections.emptyList();
-    //    RxPresso rxpresso = RxPresso.from(github);
-    //    Espresso.registerIdlingResources(rxpresso);
-    //    rxpresso.given(github.repos(any()))
-    //            .withEventsFrom(Observable.just(Arrays.asList(repo)))
-    //            .expect(any())
-    //            .thenOnView(withText("android-proguards"))
-    //            .check(matches(isDisplayed()));
-    //}
+        mFragmentRule.launchActivity(null);
+        //List<Repo> t = Collections.emptyList();
+        rxpresso.given(github.repos(any()))
+                .withEventsFrom(Observable.just(Arrays.asList(repo)))
+                .expect(any())
+                .thenOnView(withText("android-proguards"))
+                .check(matches(isDisplayed()));
+    }
 }
